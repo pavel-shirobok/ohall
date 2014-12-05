@@ -13,7 +13,7 @@ function Dummer() {
             CDN_ROOT +  '/packages.json',
             function(list){
 
-                var packages = [];
+                var packages = {};
                 _.each(list, function(value){
                     var packageInfo = new DummerPackageInfo
                     (
