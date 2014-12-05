@@ -1,0 +1,21 @@
+{
+  "name": "dummer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "dummer": "bin.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "color": "^0.7.3",
+    "commander": "^2.5.0",
+    "lodash": "^2.4.1",
+    "prompt": "^0.2.14",
+    "request": "^2.49.0"
+  }
+}
