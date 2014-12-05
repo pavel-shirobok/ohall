@@ -39,7 +39,15 @@ commander.
             var packageInfo = packages[packageStruct.name];
 
             if( packageInfo ){
-                dummerInstance.install(packageInfo, function(packageName, status, error){
+                var installInfo = dummer.createInstallInfo(packageInfo, packageStruct.version, packageStruct.build);
+
+                //console.log("Installing %s  version: %s build: %s", installInfo.package.name.green, installInfo.version, installInfo.build.name);
+
+                /*console.log(installInfo.package.name);
+                console.log(installInfo.version.version);
+                console.log(installInfo.build.name);*/
+
+                dummerInstance.install(installInfo, function(packageName, status, error){
                     switch (status) {
                         case 'started' : break;
                         case 'complete' : break;

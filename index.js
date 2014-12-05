@@ -56,14 +56,9 @@ function Dummer() {
         );
     };
 
-    /*self.install = function(packageInfo, version, callback){
-        var package_root = [CDN_ROOT, packageInfo.directory]
-    };*/
-
     self.install = function(packageInfo, version, build, callback){
 
     }
-
 }
 
 
@@ -78,19 +73,46 @@ function DummerPackageInfo (name, description, directory, default_version) {
     self.__defineGetter__('name', function(){return name; });
     self.__defineGetter__('description', function(){return description; });
     self.__defineGetter__('directory', function(){return directory});
+    self.__defineGetter__('versions', function(){return versions});
+    self.__defineGetter__('default_version', function(){return default_version; });
 }
 
-function DummerPackageVersionInfo(version, directory, defualt_build) {
+function DummerPackageVersionInfo(version, directory, default_build) {
     var self = this;
     var builds = {};
     self.addBuild = function(buildInfo) {
         builds[buildInfo.name] = buildInfo;
-    }
+    };
+
+    self.__defineGetter__('builds', function(){return builds; });
+    self.__defineGetter__('version', function(){ return version; });
+    self.__defineGetter__('directory', function(){ return directory; });
+    self.__defineGetter__('default_build', function(){ return default_build; });
 }
 
 function DummerPackageBuildInfo(name, js_files, font_files, css_files, img_files) {
     var self = this;
     self.__defineGetter__('name', function(){return name; });
+}
+
+function InstallInfo (packageInfo, version, build){
+    var self = this;
+
+    if(version == 'default'){
+        version = packageInfo.default_version;
+    }
+
+    if(build == 'default'){
+        build = packageInfo.versions[version].default_build;
+    }
+
+    self.__defineGetter__('package', function(){ return packageInfo; });
+    self.__defineGetter__('version', function(){ return packageInfo.versions[version]; });
+    self.__defineGetter__('build', function(){ return self.version.builds[build]; });
+}
+
+function createInstallInfo(packageInfo, version, build){
+    return new InstallInfo(packageInfo, version, build);
 }
 
 function parseVersion(string) {
@@ -137,3 +159,4 @@ function Get(url, onSuccess, onError, format){
 module.exports.Dummer = Dummer;
 module.exports.DummerPackage = DummerPackageInfo;
 module.exports.parseVersion = parseVersion;
+module.exports.createInstallInfo = createInstallInfo;
