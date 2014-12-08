@@ -1,21 +1,23 @@
 var prompt = require('prompt');
 var color = require('color');
 var request = require('request');
+var info = require('./package_infos.js');
 var _ = require('lodash');
+var zip = require('node-zip');
 
 var CDN_ROOT = 'http://localhost:333';
 
 function Dummer() {
     var self = this;
 
-    self.list = function(callback) {
+    self.list = function(callback, onError) {
         Get(
             CDN_ROOT +  '/packages.json',
             function(list){
 
                 var packages = {};
                 _.each(list, function(value){
-                    var packageInfo = new DummerPackageInfo
+                    var packageInfo = new info.PackageInfo
                     (
                         value.name,
                         value.description,
@@ -24,23 +26,23 @@ function Dummer() {
                     );
 
                     _.each(value.versions, function(version){
-                        //console.log(version);
-                        var versionInfo = new DummerPackageVersionInfo(
+
+                        var versionInfo = new info.VersionInfo(
                             version.version,
                             version.directory,
                             version.default_build
                         );
 
                         _.each(version.builds, function(build){
-                            var buildInfo = new DummerPackageBuildInfo(
+                           /* var buildInfo = new info.BuildInfo(
                                 build.name,
                                 build.js,
                                 build.font,
                                 build.css,
                                 build.img
-                            );
+                            );*/
 
-                            versionInfo.addBuild(buildInfo);
+                            versionInfo.addBuild(build);
                         });
 
                         packageInfo.addVersion(versionInfo);
@@ -51,72 +53,44 @@ function Dummer() {
 
                 callback && callback(packages);
             },
-            function(){ },
+            onError,
             'json'
         );
     };
 
-    self.install = function(packageInfo, version, build, callback){
+    self.install = function(packageInfo, version, build, dest, onStart, onProgress, onFinish, onError){
 
+        var file_name = packageInfo.name + '@' + version.version + '!' + build + '.zip';
+
+        onStart && onStart(file_name, packageInfo, version, build);
+
+        Get(CDN_ROOT + '/' + file_name, function(data){
+
+                var unpacked = zip(data, {base64:false, checkCRC32:true });
+
+                _.each(unpacked.files['js/jquery-1.11.1.js'], function(key, v){
+                    console.log(v, key._data);
+                });
+
+                console.log(unpacked.files['js/jquery-1.11.1.js']._data.length);
+
+                onFinish && onFinish();
+        },function(err){
+            onError && onError();
+        }, 'text',
+        function(){
+            //on progress
+            onProgress && onProgress();
+        },
+            {
+                encoding: null
+            }
+        );
     }
-}
-
-
-function DummerPackageInfo (name, description, directory, default_version) {
-    var self = this;
-    var versions = {};
-
-    self.addVersion = function(packageVersion){
-        versions[packageVersion.version] = packageVersion;
-    };
-
-    self.__defineGetter__('name', function(){return name; });
-    self.__defineGetter__('description', function(){return description; });
-    self.__defineGetter__('directory', function(){return directory});
-    self.__defineGetter__('versions', function(){return versions});
-    self.__defineGetter__('default_version', function(){return default_version; });
-}
-
-function DummerPackageVersionInfo(version, directory, default_build) {
-    var self = this;
-    var builds = {};
-    self.addBuild = function(buildInfo) {
-        builds[buildInfo.name] = buildInfo;
-    };
-
-    self.__defineGetter__('builds', function(){return builds; });
-    self.__defineGetter__('version', function(){ return version; });
-    self.__defineGetter__('directory', function(){ return directory; });
-    self.__defineGetter__('default_build', function(){ return default_build; });
-}
-
-function DummerPackageBuildInfo(name, js_files, font_files, css_files, img_files) {
-    var self = this;
-    self.__defineGetter__('name', function(){return name; });
-}
-
-function InstallInfo (packageInfo, version, build){
-    var self = this;
-
-    if(version == 'default'){
-        version = packageInfo.default_version;
-    }
-
-    if(build == 'default'){
-        build = packageInfo.versions[version].default_build;
-    }
-
-    self.__defineGetter__('package', function(){ return packageInfo; });
-    self.__defineGetter__('version', function(){ return packageInfo.versions[version]; });
-    self.__defineGetter__('build', function(){ return self.version.builds[build]; });
-}
-
-function createInstallInfo(packageInfo, version, build){
-    return new InstallInfo(packageInfo, version, build);
 }
 
 function parseVersion(string) {
-    var p = { "*" : "", "@" : "", "#" : "" };
+    var p = { "*" : "", "@" : "", "!" : "" };
 
     var currentKey = '*', src = '*' + string;
 
@@ -132,31 +106,43 @@ function parseVersion(string) {
     return {
         name : p['*'],
         version : p['@'] || 'default',
-        build : p['#'] || 'default'
+        build : p['!'] || 'default'
     };
 }
 
-function DownloadManager () {
-    var self = this;
-}
 
-
-function Get(url, onSuccess, onError, format){
+function Get(url, onSuccess, onError, format, onProgress, additional){
     format = format || 'text';
     function parse_format(body){
         return format=='json'?JSON.parse(body):body;
     }
 
-    request(url, function(error, response, body){
+    var parameters = {url: url};
+    parameters = _.extend(parameters, additional);
+
+    request(parameters, function(error, response, body){
         if (!error && response.statusCode == 200){
             onSuccess && onSuccess( parse_format(body) );
         }else{
-            onError && onError(response.statusCode);
+            onError && onError(error);
         }
     });
 }
 
-module.exports.Dummer = Dummer;
-module.exports.DummerPackage = DummerPackageInfo;
 module.exports.parseVersion = parseVersion;
-module.exports.createInstallInfo = createInstallInfo;
+module.exports.Dummer = Dummer;
+
+module.exports.getVersion = function (packageStructure, version) {
+    if(version == 'default'){
+        version = packageStructure.default_version;
+    }
+
+    return packageStructure.versions[version];
+};
+
+module.exports.getBuild = function(packageStructure, version, build){
+    if(build == 'default'){
+        build = version.default_build;
+    }
+    return version.builds[build];
+};
