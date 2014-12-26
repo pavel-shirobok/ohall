@@ -40,7 +40,7 @@ OhAll.prototype.loadPackages = function(onComplete, onError) {
 };
 
 OhAll.prototype.getList = function(onPackage) {
-    _.each(this.packages.__packages, function($package){
+    _.each(this.packages.get(), function($package){
         onPackage && onPackage($package);
     });
 };
@@ -53,6 +53,99 @@ OhAll.prototype.install = function(url, onComplete, onError, onProgress) {
     //TODO
 };
 
+OhAll.prototype.resolveQuery = function(query, onResolved, onError) {
+    var parsedQuery = this.__parseQueryString(query);
+
+    var self = this;
+    // Resolving package by name :
+    self.__resolvePackage(
+        parsedQuery.name,
+        function($package){
+
+            // Package resolved. Resolving version :
+            self.__resolveVersion(
+                $package,
+                parsedQuery.version,
+                function($version){
+
+                    //Version resolved. Resolving build:
+                    self.__resolveBuild(
+                        $package,
+                        $version,
+                        parsedQuery.build,
+                        function($build){
+
+                            //All parts resolved!
+                            onResolved && onResolved($package, $version, $build);
+
+                        }, onError
+                    )
+                }, onError
+            )
+        },onError
+    )
+
+};
+
+OhAll.prototype.__resolvePackage = function(name, onResolved, onError){
+    var resolvedPackage = this.packages.get(name);
+    if(resolvedPackage){
+        onResolved && onResolved(resolvedPackage);
+    }else{
+        onError && onError('Unknown package name : ' + name);
+    }
+};
+
+OhAll.prototype.__resolveVersion = function($package, ver, onResolved, onError){
+
+    var version = ver;
+    if(version == 'default'){
+        version = $package.defaultVersion;
+    }
+
+    var $version = $package.__versions[version];
+    if($version){
+        onResolved && onResolved($version);
+    }else{
+        onError && onError('Unknown version : ' + ver);
+    }
+};
+
+OhAll.prototype.__resolveBuild = function($package, $version, bld, onResolved, onError){
+
+    var build = bld;
+    if(build == 'default'){
+        build = $version.defaultBuild;
+    }
+
+    var $build = $version.__builds[build];
+    if($build){
+        onResolved && onResolved($build);
+    }else{
+        onError && onError('Unknown build name : ' + bld);
+    }
+};
+
+OhAll.prototype.__parseQueryString = function(query) {
+    var p = { "*" : "", "@" : "", "!" : "" };
+
+    var currentKey = '*', src = '*' + query;
+
+    for(var i = 1; i < src.length; i++){
+        var c = src[i];
+        if(c in p){
+            currentKey = c;
+        }else{
+            p[currentKey]+=c;
+        }
+    }
+
+    return {
+        name : p['*'],
+        version : p['@'] || 'default',
+        build : p['!'] || 'default'
+    };
+};
 
 
 

@@ -9,6 +9,13 @@ PackageCollection.prototype.add = function($package){
     return this;
 };
 
+PackageCollection.prototype.get = function(name){
+    if(name){
+        return this.__packages[name];
+    }
+    return this.__packages;
+};
+
 PackageCollection.parseRawPackagesJson = function(rawPackages) {
     var packageCollection = new PackageCollection();
 
@@ -37,7 +44,7 @@ Package.parseRawPackage = function(rawPackage){
     var $package = new Package(
         rawPackage.name,
         rawPackage.description,
-        rawPackage.defaultVersion
+        rawPackage.default_version
     );
 
     _.each(rawPackage.versions, function(rawVersion){
@@ -63,7 +70,7 @@ Version.prototype.addBuild = function(build){
 Version.parseRawVersion = function(rawVersion) {
     var version = new Version(
         rawVersion.version,
-        rawVersion.defaultBuild
+        rawVersion.default_build
     );
 
     _.each(rawVersion.builds, function(rawBuild){
