@@ -1,3 +1,8 @@
+//function
+
+
+
+/*
 function PackageInfo (name, description, directory, default_version) {
     var self = this;
     var versions = {};
@@ -29,4 +34,4 @@ function VersionInfo(version, directory, default_build) {
 
 
 module.exports.VersionInfo = VersionInfo;
-module.exports.PackageInfo = PackageInfo;
+module.exports.PackageInfo = PackageInfo;*/
