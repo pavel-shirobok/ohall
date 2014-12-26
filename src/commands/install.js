@@ -19,13 +19,13 @@ exports = module.exports = function(ohAll){
                 eventHandlers.onPackageInstallComplete
             );
         } else {
+            console.log('coming soon in version 0.2.0');
             //install from ohall.json
         }
-
-
     };
 
     self.__install = function(packageName, onComplete, onError){
+
         ohAll.resolveQuery(packageName, function($package, $version, $build){
             var blobUrl = ohAll.getBlobUrl($package, $version, $build);
             ///TODO some console output
@@ -38,7 +38,7 @@ exports = module.exports = function(ohAll){
                     if(self.index < self.packages.length){
                         self.__install(self.packages[self.index], eventHandlers.onPackageInstallComplete);
                     }else {
-
+                        //TODO global complete callback
                     }
                 }, function(){
                     //TODO error

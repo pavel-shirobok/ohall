@@ -46,10 +46,10 @@ function Dummer() {
                             );*//*
 
 
-                            versionInfo.addBuild(build);
+                            versionInfo.add(build);
                         });
 
-                        packageInfo.addVersion(versionInfo);
+                        packageInfo.add(versionInfo);
                     });
 
                     packages[value.name] = packageInfo;

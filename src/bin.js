@@ -21,8 +21,6 @@ _(require('./commands/commandsList')).each(function(CommandClass){
         action(command.fn);
 });
 
-console.log("Wait please..."); // TODO color
-
 ohAll.loadPackages(
     function() {
         commander.parse(process.argv);

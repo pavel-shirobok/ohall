@@ -52,7 +52,7 @@ OhAll.prototype.install = function(url, onComplete, onError, onProgress) {
 
     setTimeout(function(){
         onComplete && onComplete();
-    }, 500)
+    }, 500);
 
     /*RQ({ url : url }).
         onComplete(function(data){
@@ -111,7 +111,7 @@ OhAll.prototype.__resolveVersion = function($package, ver, onResolved, onError){
         version = $package.defaultVersion;
     }
 
-    var $version = $package.__versions[version];
+    var $version = $package.get(version);
     if($version){
         onResolved && onResolved($version);
     }else{
@@ -126,7 +126,7 @@ OhAll.prototype.__resolveBuild = function($package, $version, bld, onResolved, o
         build = $version.defaultBuild;
     }
 
-    var $build = $version.__builds[build];
+    var $build = $version.get(build);
     if($build){
         onResolved && onResolved($build);
     }else{
@@ -154,9 +154,6 @@ OhAll.prototype.__parseQueryString = function(query) {
         build : p['!'] || 'default'
     };
 };
-
-
-
 
 module.exports.createOhAll = function(settings){
     return new OhAll(settings);
