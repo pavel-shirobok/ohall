@@ -27,11 +27,11 @@ ohAll.loadPackages(
     function() {
         commander.parse(process.argv);
 
-        ohAll.resolveQuery('jquery', function($package, $version, $build){
+        /*ohAll.resolveQuery('jquery', function($package, $version, $build){
             console.log($package.name, $version.name, $build.name);
         }, function(err){
             console.log(err);
-        });
+        });*/
 
     },
     function(error){

@@ -40,17 +40,25 @@ OhAll.prototype.loadPackages = function(onComplete, onError) {
 };
 
 OhAll.prototype.getList = function(onPackage) {
-    _.each(this.packages.get(), function($package){
-        onPackage && onPackage($package);
-    });
+    _.each(this.packages.get(), onPackage);
 };
 
-OhAll.prototype.getBlobUrl = function(blob, version, build){
-    //TODO
+OhAll.prototype.getBlobUrl = function($package, $version, $build){
+    var file_name = $package.name + '@' + $version.name + '!' + $build.name + '.zip';
+    return [this.settings.get('CDN_URL'), file_name].join('/')
 };
 
 OhAll.prototype.install = function(url, onComplete, onError, onProgress) {
-    //TODO
+
+    setTimeout(function(){
+        onComplete && onComplete();
+    }, 500)
+
+    /*RQ({ url : url }).
+        onComplete(function(data){
+
+        }).
+        onError(onError);*/
 };
 
 OhAll.prototype.resolveQuery = function(query, onResolved, onError) {
