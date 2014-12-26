@@ -1,8 +1,45 @@
 #!/usr/bin/env node
+
+var _ = require('lodash');
+var config = require('./config');
+var settings = require('./settings').
+    createSettings(
+        config.GLOBAL_CONFIG_FILENAME,
+        config.DEFAULT_GLOBAL_CONFIG
+    );
+
+var ohAll = require('./ohall').createOhAll(settings);
+
+var commander = require('commander');
+
+_(require('./commands/commandsList')).each(function(CommandClass){
+
+    var command = new CommandClass(ohAll);
+    commander.
+        command(command.command).
+        description(command.description).
+        action(command.fn);
+});
+
+console.log("Wait please..."); // TODO color
+
+ohAll.loadPackages(
+    function() {
+        commander.parse(process.argv);
+    },
+    function(error){
+        //TODO error console
+        console.log(error);
+    }
+);
+
+
+
+/*
 var commander = require('commander');
 var _ = require('lodash');
 
-var dummer = require('./index.js');
+var dummer = require('./../src/index.js');
 var Dummer = dummer.Dummer;
 
 var dummerInstance = new Dummer();
@@ -67,17 +104,21 @@ commander.
 
                 //console.log("Installing %s  version: %s build: %s", installInfo.package.name.green, installInfo.version, installInfo.build.name);
 
-                /*console.log(installInfo.package.name);
+                */
+/*console.log(installInfo.package.name);
                 console.log(installInfo.version.version);
-                console.log(installInfo.build.name);*/
+                console.log(installInfo.build.name);*//*
 
-                /*dummerInstance.install(installInfo.package, installInfo.version, installInfo.build, function(packageName, status, error){
+
+                */
+/*dummerInstance.install(installInfo.package, installInfo.version, installInfo.build, function(packageName, status, error){
                     switch (status) {
                         case 'started' : break;
                         case 'complete' : break;
                         case 'error' : break;
                     }
-                });*/
+                });*//*
+
             }else{
                 console.log("Unknown package name \"%s\". Please check available packages with \"dummer list\" command".red, packageStruct.name);
             }
@@ -86,4 +127,4 @@ commander.
         });
     });
 
-commander.parse(process.argv);
+commander.parse(process.argv);*/

@@ -1,3 +1,4 @@
+/*
 var prompt = require('prompt');
 var color = require('color');
 var request = require('request');
@@ -35,13 +36,15 @@ function Dummer() {
                         );
 
                         _.each(version.builds, function(build){
-                           /* var buildInfo = new info.BuildInfo(
+                           */
+/* var buildInfo = new info.BuildInfo(
                                 build.name,
                                 build.js,
                                 build.font,
                                 build.css,
                                 build.img
-                            );*/
+                            );*//*
+
 
                             versionInfo.addBuild(build);
                         });
@@ -107,45 +110,8 @@ function Dummer() {
     }
 }
 
-function parseVersion(string) {
-    var p = { "*" : "", "@" : "", "!" : "" };
-
-    var currentKey = '*', src = '*' + string;
-
-    for(var i = 1; i < src.length; i++){
-        var c = src[i];
-        if(c in p){
-            currentKey = c;
-        }else{
-            p[currentKey]+=c;
-        }
-    }
-
-    return {
-        name : p['*'],
-        version : p['@'] || 'default',
-        build : p['!'] || 'default'
-    };
-}
 
 
-function Get(url, onSuccess, onError, format, onProgress, additional){
-    format = format || 'text';
-    function parse_format(body){
-        return format=='json'?JSON.parse(body):body;
-    }
-
-    var parameters = {url: url};
-    parameters = _.extend(parameters, additional);
-
-    request(parameters, function(error, response, body){
-        if (!error && response.statusCode == 200){
-            onSuccess && onSuccess( parse_format(body) );
-        }else{
-            onError && onError(error);
-        }
-    });
-}
 
 module.exports.parseVersion = parseVersion;
 module.exports.Dummer = Dummer;
@@ -163,4 +129,13 @@ module.exports.getBuild = function(packageStructure, version, build){
         build = version.default_build;
     }
     return version.builds[build];
-};
+};*/
+
+
+
+
+
+
+module.exports.createOhAll = function(){
+    return null;
+}
