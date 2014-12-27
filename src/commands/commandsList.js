@@ -1,6 +1,17 @@
-var r = function(name) { return require('./' + name); };
-exports = module.exports = [
-    r('configSet'),r('configGet'),
-    r('list'),
-    r('install')
-];
+var fs   = require('fs');
+var _    = require('lodash');
+
+exports = module.exports = (function(){
+    //exporting all files with filename in @ as first letter
+   return _.map(
+        _.filter(
+            fs.readdirSync( __dirname ),
+            function (filename) {
+                return filename != '.' && filename != '..' && filename[0] == '@'
+            }
+        ),
+        function (filename) {
+            return require('./' + filename);
+        }
+    );
+})();

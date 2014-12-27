@@ -3,7 +3,7 @@ var zip               = require('node-zip');
 var fs                = require('fs');
 
 
-var RQ                = require('./request_helper').RQ;
+var RQ                = require('./request_helper');
 var PackageCollection = require('./packageCollection');
 var config            = require('./config');
 
@@ -186,6 +186,13 @@ OhAll.prototype.__parseQueryString = function(query) {
         version : p['@'] || 'default',
         build : p['!'] || 'default'
     };
+};
+
+
+OhAll.prototype.find = function(query) {
+    return _.filter(this.packages.get(), function($package){
+        return !!($package.name.indexOf(query) > -1 || $package.description.indexOf(query) > -1);
+    });
 };
 
 module.exports.createOhAll = function(settings){

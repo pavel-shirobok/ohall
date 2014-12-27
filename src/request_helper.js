@@ -55,6 +55,6 @@ var RQ = function (parameters) {
         onError(noop);
 };
 
-module.exports.RQ = function (parameters) {
+exports = module.exports = function (parameters) {
     return new RQ(parameters);
 };
