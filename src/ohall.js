@@ -1,4 +1,6 @@
 var _                 = require('lodash');
+var zip               = require('node-zip');
+var fs                = require('fs');
 
 
 var RQ                = require('./request_helper').RQ;
@@ -33,9 +35,7 @@ OhAll.prototype.loadPackages = function(onComplete, onError) {
             onComplete && onComplete();
         }).
         onProgress(function(){}).
-        onError(function(error){
-            onError && onError(error);
-        }).
+        onError(onError).
         finish();
 };
 
@@ -50,15 +50,48 @@ OhAll.prototype.getBlobUrl = function($package, $version, $build){
 
 OhAll.prototype.install = function(url, onComplete, onError, onProgress) {
 
-    setTimeout(function(){
-        onComplete && onComplete();
-    }, 500);
-
-    /*RQ({ url : url }).
+    var self = this;
+    RQ({ url : url, format : 'text', encoding: null}).
         onComplete(function(data){
-
+            self.__unzip(
+                data,
+                function(fileName, fileContent){
+                    console.log(fileName, fileContent.length);
+                    fs.writeFileSync(fileName, fileContent)
+                },
+                function(directory) {
+                    if (!fs.existsSync(directory)){
+                        fs.mkdirSync(directory);
+                    }
+                },
+                onComplete,
+                onError
+            );
         }).
-        onError(onError);*/
+        onError(onError).
+        finish();
+};
+
+OhAll.prototype.__unzip = function(data, onFile, onDirectory, onComplete, onError) {
+
+    var unpacked;
+
+    try{
+        unpacked = zip( data, { base64:false, checkCRC32:true } );
+    }catch ( zipError ) {
+        onError && onError(zipError);
+        return;
+    }
+
+    _.each(unpacked.files, function(value, key){
+        if( key.charAt(key.length - 1) == '/' ){
+            onDirectory && onDirectory(key);
+        } else {
+            onFile && onFile(key, value._data);
+        }
+    });
+
+    onComplete && onComplete();
 };
 
 OhAll.prototype.resolveQuery = function(query, onResolved, onError) {

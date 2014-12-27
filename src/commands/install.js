@@ -14,38 +14,47 @@ exports = module.exports = function(ohAll){
         if(packages.length){
             self.packages = packages;
 
-            self.__install(
-                packages[0],
-                eventHandlers.onPackageInstallComplete
-            );
+            self.next();
+
         } else {
             console.log('coming soon in version 0.2.0');
             //install from ohall.json
         }
     };
 
+    self.next = function(){
+        self.__nextInstall(function(packageName){
+            self.__install(
+                packageName,
+                eventHandlers.onPackageInstallComplete,
+                eventHandlers.onPackageInstallError
+            );
+        }, function(){/*TODO on complete all tasks*/});
+    };
+
+    self.__nextInstall = function(onNext, onComplete) {
+
+        if(self.index < self.packages.length){
+            var old_index = self.index;
+            self.index ++;
+            onNext && onNext(self.packages[old_index], old_index);
+        }else {
+            onComplete && onComplete();
+        }
+    };
+
     self.__install = function(packageName, onComplete, onError){
 
         ohAll.resolveQuery(packageName, function($package, $version, $build){
+
             var blobUrl = ohAll.getBlobUrl($package, $version, $build);
-            ///TODO some console output
+
             ohAll.install(blobUrl,
                 function(){
-
                     onComplete && onComplete($package);
-
-                    self.index++;
-                    if(self.index < self.packages.length){
-                        self.__install(self.packages[self.index], eventHandlers.onPackageInstallComplete);
-                    }else {
-                        //TODO global complete callback
-                    }
-                }, function(){
-                    //TODO error
-                }
-            )
-
-
+                    self.next();
+                }, onError
+            );
         }, eventHandlers.onQueryResolveError);
     }
 
