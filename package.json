@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "color": "^0.7.3",
+    "colors": "^1.0.3",
     "commander": "^2.5.0",
     "lodash": "^2.4.1",
     "node-zip": "^1.1.0",

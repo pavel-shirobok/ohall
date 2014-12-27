@@ -188,7 +188,6 @@ OhAll.prototype.__parseQueryString = function(query) {
     };
 };
 
-
 OhAll.prototype.find = function(query) {
     return _.filter(this.packages.get(), function($package){
         return !!($package.name.indexOf(query) > -1 || $package.description.indexOf(query) > -1);

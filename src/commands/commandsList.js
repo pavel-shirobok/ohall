@@ -6,12 +6,8 @@ exports = module.exports = (function(){
    return _.map(
         _.filter(
             fs.readdirSync( __dirname ),
-            function (filename) {
-                return filename != '.' && filename != '..' && filename[0] == '@'
-            }
+            function (filename) { return filename != '.' && filename != '..' && filename[0] == '@' }
         ),
-        function (filename) {
-            return require('./' + filename);
-        }
+        function (filename) { return require('./' + filename); }
     );
 })();
