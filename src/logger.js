@@ -29,3 +29,7 @@ module.exports.createFindHeaderMessage = function(query) {
 module.exports.createFindResultMessage = function(packageName, packageDescription){
     return new Message(' * '.tab + packageName.green + ' : ' + packageDescription.green);
 };
+
+module.exports.createEmptyFindResultMessage = function(query){
+    return new Message( (' I can\'t find anything by "' + query + '"').red );
+};

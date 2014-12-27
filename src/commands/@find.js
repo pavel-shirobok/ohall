@@ -8,9 +8,19 @@ exports = module.exports = function(ohAll){
     self.description = 'Finding available packages by query';
     self.fn = function(query) {
 
-        logger.createFindHeaderMessage(query).log();
 
-        _.each(ohAll.find(query), function($package){
+
+        var findResult = ohAll.find(query);
+
+        if(findResult.length == 0){
+            logger.createEmptyFindResultMessage(
+                query
+            ).log();
+            return;
+        }
+
+        logger.createFindHeaderMessage(query).log();
+        _.each(findResult, function($package){
             logger.createFindResultMessage(
                 $package.name, $package.description
             ).log();

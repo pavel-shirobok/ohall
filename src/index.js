@@ -138,4 +138,4 @@ module.exports.getBuild = function(packageStructure, version, build){
 
 module.exports.createOhAll = function(){
     return null;
-}
+};

@@ -189,9 +189,17 @@ OhAll.prototype.__parseQueryString = function(query) {
 };
 
 OhAll.prototype.find = function(query) {
-    return _.filter(this.packages.get(), function($package){
-        return !!($package.name.indexOf(query) > -1 || $package.description.indexOf(query) > -1);
+    query = query.toLowerCase();
+    var self = this;
+    return _.filter(self.packages.get(), function($package){
+        return self.search($package.name, query) || self.search($package.description, query);
     });
+};
+
+OhAll.prototype.search = function(str, query){
+    query = query.toLowerCase();
+    str   =   str.toLowerCase();
+    return str.indexOf(query) > -1;
 };
 
 module.exports.createOhAll = function(settings){
