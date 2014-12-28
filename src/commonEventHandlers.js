@@ -9,3 +9,4 @@ module.exports.onPackageInstallComplete = function($package, url, files) {
 module.exports.onPackageInstallError = function(error){
     console.log('error', error); //TODO
 };
+

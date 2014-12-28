@@ -8,8 +8,6 @@ exports = module.exports = function(ohAll){
     self.description = 'Finding available packages by query';
     self.fn = function(query) {
 
-
-
         var findResult = ohAll.find(query);
 
         if(findResult.length == 0){

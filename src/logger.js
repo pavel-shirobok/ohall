@@ -1,7 +1,8 @@
 require('colors').setTheme({
     variable : 'blue',
     value    : 'yellow',
-    tab      : 'grey'
+    tab      : 'grey',
+    pckg     : 'red'
 });
 
 function Message(str){
@@ -11,8 +12,6 @@ function Message(str){
 Message.prototype.log = function(){
     console.log(this.string);
 };
-
-
 
 module.exports.createConfigGetMessage = function(name, value) {
     return new Message('> '.tab + name.variable + ' = "' + value.value + '"');
@@ -32,4 +31,15 @@ module.exports.createFindResultMessage = function(packageName, packageDescriptio
 
 module.exports.createEmptyFindResultMessage = function(query){
     return new Message( (' I can\'t find anything by "' + query + '"').red );
+};
+
+module.exports.createTellHeader = function(packageName) {
+    return new Message('> I tell you about "' + packageName.pckg + '". There are next versions :')
+};
+
+module.exports.createTellAboutVersion = function(versionName, builds, defaultVersion, defaultBuild){
+
+    versionName = versionName == defaultVersion? versionName.bgGreen.white : versionName.red;
+
+    return new Message(' * ' + versionName)
 };
