@@ -1,7 +1,8 @@
 var _                 = require('lodash');
 var zip               = require('node-zip');
 var fs                = require('fs');
-
+var recursive         = require('recursive-readdir');
+var path              = require('path');
 
 var RQ                = require('./request_helper');
 var PackageCollection = require('./packageCollection');
@@ -48,8 +49,12 @@ OhAll.prototype.getList = function(onPackage) {
 };
 
 OhAll.prototype.getBlobUrl = function($package, $version, $build){
-    var file_name = $package.name + '@' + $version.name + '!' + $build.name + '.zip';
+    var file_name = this.getBlobStringFormat($package.name, $version.name, $build.name) + '.zip';
     return [this.settings.get('CDN_URL'), file_name].join('/')
+};
+
+OhAll.prototype.getBlobStringFormat = function(packageName, versionName, buildName){
+    return packageName + '@' + versionName + '!' + buildName;
 };
 
 OhAll.prototype.install = function(url, onComplete, onError, onProgress) {
@@ -205,6 +210,133 @@ OhAll.prototype.search = function(str, query){
     str   =   str.toLowerCase();
     return str.indexOf(query) > -1;
 };
+
+OhAll.prototype.createPackageDescriptor = function(rawQuery, _dir){
+    var self = this;
+
+    var $package;
+    var query = this.__parseQueryString(rawQuery);
+
+    if(query.name.length == 0){
+        throw new Error('Package query is empty');
+    }
+
+    scan(_dir, query.name,
+        self.noop,
+        function(packagePath){
+
+            scan(
+                [_dir, packagePath].join('/'),
+                query.version,
+
+                //Reading manifest
+                function(dot) {
+                    if('.manifest' == dot){
+                        $package = JSON.parse(
+                            fs.readFileSync([_dir, packagePath, dot].join('/'))
+                        );
+                        $package.versions = {};
+                    }
+                },
+                //Reading version's directories
+                function(versionPath){
+
+                    $package.versions[versionPath] = {
+                        version : versionPath,
+                        builds : []
+                    };
+
+                    scan(
+                        [_dir, packagePath, versionPath].join('/'),
+                        query.build,
+                        function(dot){
+                            if('.defaultVersion' == dot){
+                                $package.defaultVersion = versionPath;
+                            }
+                        },
+                        //
+                        function(buildPath){
+                            $package.versions[versionPath].builds.push(buildPath);
+                            scan(
+                                [_dir, packagePath, versionPath, buildPath].join('/'),
+                                'default',
+                                function(dot){
+                                    if('.defaultBuild' == dot){
+                                        $package.versions[versionPath].defaultBuild = buildPath;
+                                    }
+                                }
+                            )
+
+                        }
+                    )
+
+                }
+
+            );
+
+        //console.log(packagePath)
+    });
+    function scan(path, query, onDot, onDir){
+        _.each(
+            fs.readdirSync(path),
+            function(p){
+                if(p == '.' || p == '..')return;
+
+                if(p[0] == '.'){
+                    onDot && onDot(p);
+                } else {
+                    if(query == 'default' || query == p){
+                        onDir && onDir(p);
+                    }
+                }
+            }
+        )
+    }
+
+    return $package;
+};
+
+OhAll.prototype.generatePathFromDescriptor = function($package, _dir){
+    var pathes = [];
+    var self = this;
+    _.each($package.versions, function($version){
+        _.each($version.builds, function($build){
+            pathes.push(
+                {
+                    path : [_dir, $package.name, $version.version, $build].join('/'),
+                    file : self.getBlobStringFormat($package.name, $version.version, $build),
+                    comment : $package.name + ' : ' + $package.description
+                }
+            );
+        });
+    });
+
+    return pathes;
+};
+
+OhAll.prototype.pack = function(packageSourcePath, onComplete, onError){
+
+    packageSourcePath = String(path.normalize(packageSourcePath));
+
+    recursive(packageSourcePath, ['.defaultBuild'], function(err, packageSources){
+        if(err)
+            onError && onError(err);
+
+        var zipHandle = zip();
+
+        _.each(packageSources, function(srcPath){
+            //some problem with pathes started with '\' so need to remove it before create file into zip
+            zipHandle.file(
+                path.normalize(srcPath.replace(packageSourcePath + '\\', '')),
+                fs.readFileSync(srcPath)
+            );
+        });
+        onComplete && onComplete(zipHandle);
+    });
+
+};
+
+OhAll.prototype.noop = function(){};
 
 module.exports.createOhAll = function(settings){
     return new OhAll(settings);

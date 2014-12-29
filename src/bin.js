@@ -23,7 +23,7 @@ _(require('./commands/commandsList')).each(function(CommandClass){
 });
 
 if(argv.dev) {
-    console.log('Dev start');
+    console.log('Dev start'); // TODO logger
     ohAll.loadEmptyPackages();
     commander.parse(process.argv);
 }else {
