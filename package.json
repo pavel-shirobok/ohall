@@ -1,13 +1,12 @@
 {
   "name": "ohall",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Light weight console based tool for front-end developers. Fast access to most important js libraries(jQuery, Angular.js etc.)",
-
-  "keywords" : [
-    "front-end", "bower analog", "ohall"
+  "keywords": [
+    "front-end",
+    "bower analog",
+    "ohall"
   ],
-
-
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,22 +15,21 @@
     "ohall": "src/bin.js"
   },
   "author": {
-    "name" : "Pavel Shirobok",
-    "email" : "pavel.shirobok@gmail.com",
-    "url" : "http://ramshteks.com"
+    "name": "Pavel Shirobok",
+    "email": "pavel.shirobok@gmail.com",
+    "url": "http://ramshteks.com"
   },
-
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/ramshteks/ohall.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ramshteks/ohall.git"
   },
-
   "license": "ISC",
   "dependencies": {
     "colors": "^1.0.3",
     "commander": "^2.5.0",
     "lodash": "^2.4.1",
     "node-zip": "^1.1.0",
+    "optimist": "^0.6.1",
     "progress": "^1.1.8",
     "prompt": "^0.2.14",
     "request": "^2.49.0"

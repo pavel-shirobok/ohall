@@ -39,6 +39,10 @@ OhAll.prototype.loadPackages = function(onComplete, onError) {
         finish();
 };
 
+OhAll.prototype.loadEmptyPackages = function(){
+    this.packages = PackageCollection.parseRawPackagesJson({});
+};
+
 OhAll.prototype.getList = function(onPackage) {
     _.each(this.packages.get(), onPackage);
 };
