@@ -3,6 +3,7 @@ var zip               = require('node-zip');
 var fs                = require('fs');
 var recursive         = require('recursive-readdir');
 var path              = require('path');
+var mkdirp            = require('mkdirp').sync;
 
 var RQ                = require('./request_helper');
 var PackageCollection = require('./packageCollection');
@@ -65,8 +66,12 @@ OhAll.prototype.install = function(url, onComplete, onError, onProgress) {
             self.__unzip(
                 data,
                 function(fileName, fileContent){
-                    console.log(fileName, fileContent.length);
-                    fs.writeFileSync(fileName, fileContent)
+
+                    var splited = fileName.split('\\');
+                    splited.pop();
+
+                    mkdirp(splited.join('\\'));
+                    fs.writeFileSync(fileName, fileContent);
                 },
                 function(directory) {
                     if (!fs.existsSync(directory)){
@@ -93,7 +98,7 @@ OhAll.prototype.__unzip = function(data, onFile, onDirectory, onComplete, onErro
     }
 
     _.each(unpacked.files, function(value, key){
-        if( key.charAt(key.length - 1) == '/' ){
+        if( key.charAt(key.length - 1) == '\\' ){
             onDirectory && onDirectory(key);
         } else {
             onFile && onFile(key, value._data);
@@ -327,7 +332,8 @@ OhAll.prototype.pack = function(packageSourcePath, onComplete, onError){
             //some problem with pathes started with '\' so need to remove it before create file into zip
             zipHandle.file(
                 path.normalize(srcPath.replace(packageSourcePath + '\\', '')),
-                fs.readFileSync(srcPath)
+                fs.readFileSync(srcPath),
+                { createFolders : true }
             );
         });
         onComplete && onComplete(zipHandle);

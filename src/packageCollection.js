@@ -37,12 +37,6 @@ PackageCollection.prototype.toPOJO = function() {
 
 //to-tell
 PackageCollection.prototype.merge = function($otherCollection) {
-
-    console.log(JSON.stringify(_.merge(
-        this.toPOJO(),
-        $otherCollection.toPOJO()
-    ), null, 4));
-
     return PackageCollection.parseRawPackages(
         _.merge(
             this.toPOJO(),
