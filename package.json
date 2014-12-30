@@ -1,6 +1,6 @@
 {
   "name": "ohall",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "description": "Light weight console based tool for front-end developers. Fast access to most important js libraries(jQuery, Angular.js etc.)",
   "keywords": [
     "front-end",

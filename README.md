@@ -5,11 +5,12 @@
 ![Oh all!](http://s4.pikabu.ru/post_img/2014/11/08/0/1415395460_1317738278.jpg)
 
 ##Motivation
-1. ```Bower``` and etc product is great and powerful tools, but sometimes I just need last jquery. I don't need documentation sources or jquery sources in strange 'bower_components' folder.
+1. ```Bower``` and etc products are great and powerful tools, but sometimes I just need last jquery. I don't need documentation sources or jquery sources in strange 'bower_components' folder.
 2. ```Bower``` request for work git, I think this isn't always comfortable, when I just want receive ```angular.js``` build
-3. Also I wanted to level up my ```node.js```
-4. I think ```bower``` too powerful product for many tasks.
-5. Oh all!
+3. I don't want to search CDN links.
+4. Also I wanted to level up my ```node.js```
+5. I think ```bower``` too powerful product for many tasks.
+6. Oh all!
 
 ##Installing
 ```
