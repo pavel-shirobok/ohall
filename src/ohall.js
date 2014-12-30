@@ -32,7 +32,7 @@ OhAll.prototype.loadPackages = function(onComplete, onError) {
     var self = this;
     RQ(request_parameters).
         onComplete(function(data){
-            self.packages = PackageCollection.parseRawPackagesJson(data);
+            self.packages = PackageCollection.parseRawPackages(data);
             onComplete && onComplete();
         }).
         onProgress(function(){}).
@@ -41,7 +41,7 @@ OhAll.prototype.loadPackages = function(onComplete, onError) {
 };
 
 OhAll.prototype.loadEmptyPackages = function(){
-    this.packages = PackageCollection.parseRawPackagesJson({});
+    this.packages = PackageCollection.parseRawPackages({});
 };
 
 OhAll.prototype.getList = function(onPackage) {
@@ -104,7 +104,7 @@ OhAll.prototype.__unzip = function(data, onFile, onDirectory, onComplete, onErro
 };
 
 OhAll.prototype.resolveQuery = function(query, onResolved, onError) {
-    var parsedQuery = this.__parseQueryString(query);
+    var parsedQuery = this.parseQueryString(query);
 
     var self = this;
     // Resolving package by name :
@@ -176,7 +176,7 @@ OhAll.prototype.__resolveBuild = function($package, $version, bld, onResolved, o
     }
 };
 
-OhAll.prototype.__parseQueryString = function(query) {
+OhAll.prototype.parseQueryString = function(query) {
     var p = { "*" : "", "@" : "", "!" : "" };
 
     var currentKey = '*', src = '*' + query;
@@ -201,7 +201,9 @@ OhAll.prototype.find = function(query) {
     query = query.toLowerCase();
     var self = this;
     return _.filter(self.packages.get(), function($package){
-        return self.search($package.name, query) || self.search($package.description, query);
+        return  self.search($package.name, query) ||
+                self.search($package.description, query) ||
+                self.search($package.fullName, query);
     });
 };
 
@@ -211,11 +213,10 @@ OhAll.prototype.search = function(str, query){
     return str.indexOf(query) > -1;
 };
 
-OhAll.prototype.createPackageDescriptor = function(rawQuery, _dir){
+OhAll.prototype.createPackageDescriptor = function(query, _dir){
     var self = this;
 
-    var $package;
-    var query = this.__parseQueryString(rawQuery);
+    var $package = {};
 
     if(query.name.length == 0){
         throw new Error('Package query is empty');
@@ -273,8 +274,6 @@ OhAll.prototype.createPackageDescriptor = function(rawQuery, _dir){
                 }
 
             );
-
-        //console.log(packagePath)
     });
     function scan(path, query, onDot, onDir){
         _.each(
@@ -293,18 +292,18 @@ OhAll.prototype.createPackageDescriptor = function(rawQuery, _dir){
         )
     }
 
-    return $package;
+    return PackageCollection.parseRawPackages([$package]);
 };
 
 OhAll.prototype.generatePathFromDescriptor = function($package, _dir){
     var pathes = [];
     var self = this;
-    _.each($package.versions, function($version){
-        _.each($version.builds, function($build){
+    _.each($package.get(), function($version){
+        _.each($version.get(), function($build){
             pathes.push(
                 {
-                    path : [_dir, $package.name, $version.version, $build].join('/'),
-                    file : self.getBlobStringFormat($package.name, $version.version, $build),
+                    path : [_dir, $package.name, $version.name, $build.name].join('/'),
+                    file : self.getBlobStringFormat($package.name, $version.name, $build.name),
                     comment : $package.name + ' : ' + $package.description
                 }
             );
@@ -337,6 +336,16 @@ OhAll.prototype.pack = function(packageSourcePath, onComplete, onError){
 };
 
 OhAll.prototype.noop = function(){};
+
+OhAll.prototype.readPackagesFromFile = function(path){
+    var raw = JSON.parse(fs.readFileSync(path));
+    return PackageCollection.parseRawPackages(raw);
+};
+
+OhAll.prototype.writePackagesToFile = function($packages, path) {
+    var pojo = $packages.toPOJO();
+    fs.writeFileSync(path, JSON.stringify(pojo, null, 2));
+};
 
 module.exports.createOhAll = function(settings){
     return new OhAll(settings);

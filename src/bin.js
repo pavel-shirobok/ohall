@@ -11,10 +11,11 @@ var settings = require('./settings').
 var ohAll = require('./ohall').createOhAll(settings);
 
 var commander = require('commander');
-commander.option('--dev');
+commander.
+    version(require('../package.json').version).
+    option('--dev', 'Fast loading, using fake packages list');
 
 _(require('./commands/commandsList')).each(function(CommandClass){
-
     var command = new CommandClass(ohAll);
     commander.
         command(command.command).
@@ -24,7 +25,7 @@ _(require('./commands/commandsList')).each(function(CommandClass){
 
 if(argv.dev) {
     console.log('Dev start'); // TODO logger
-    ohAll.loadEmptyPackages();
+    ohAll.loadEmptyPackages(); //refactor for using loadFromObject({})
     commander.parse(process.argv);
 }else {
     ohAll.loadPackages(

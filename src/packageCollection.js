@@ -30,12 +30,34 @@ PackageCollection.prototype.get = function(name){
     return this.__packages;
 };
 
+//to-tell
+PackageCollection.prototype.toPOJO = function() {
+    return PackageCollection.toPOJO(this);
+};
+
+//to-tell
+PackageCollection.prototype.merge = function($otherCollection) {
+
+    console.log(JSON.stringify(_.merge(
+        this.toPOJO(),
+        $otherCollection.toPOJO()
+    ), null, 4));
+
+    return PackageCollection.parseRawPackages(
+        _.merge(
+            this.toPOJO(),
+            $otherCollection.toPOJO(),
+            function(a, b) { return _.isArray(a) ? _.uniq(a.concat(b)) : undefined; }
+        )
+    );
+};
+
 /**
  * Create {@link PackageCollection} instance from raw object(from cdn packages.json)
  * @param rawPackages
  * @returns {PackageCollection}
  */
-PackageCollection.parseRawPackagesJson = function(rawPackages) {
+PackageCollection.parseRawPackages = function(rawPackages) {
     var packageCollection = new PackageCollection();
 
     //noinspection JSUnresolvedFunction
@@ -48,17 +70,30 @@ PackageCollection.parseRawPackagesJson = function(rawPackages) {
     return packageCollection;
 };
 
+//to-tell
+PackageCollection.toPOJO = function($packages){
+    return _.mapValues($packages.get(),function($package){
+        return $package.toPOJO();
+    });
+};
+
 /**
  * Descriptor for package
  * @param name
+ * @param fullName
  * @param description
  * @param defaultVersion
  * @constructor
+ * @param url
+ * @param apiUrl
  */
-var Package = function(name, description, defaultVersion){
+var Package = function(name, fullName, description, defaultVersion, url, apiUrl){
     this.name = name;
+    this.fullName = fullName;
     this.description = description;
     this.defaultVersion = defaultVersion;
+    this.url = url;
+    this.apiUrl = apiUrl;
     this.__versions = {};
 };
 
@@ -84,6 +119,11 @@ Package.prototype.get = function(name){
     return this.__versions;
 };
 
+//to-tell
+Package.prototype.toPOJO = function(){
+    return Package.toPOJO(this);
+};
+
 /**
  * Create {@link Package} from raw object (packages.json)
  * @param rawPackage
@@ -92,8 +132,11 @@ Package.prototype.get = function(name){
 Package.parseRawPackage = function(rawPackage){
     var $package = new Package(
         rawPackage.name,
+        rawPackage.fullName,
         rawPackage.description,
-        rawPackage.defaultVersion
+        rawPackage.defaultVersion,
+        rawPackage.url,
+        rawPackage.apiUrl
     );
 
     //noinspection JSUnresolvedFunction,JSUnresolvedVariable
@@ -104,6 +147,24 @@ Package.parseRawPackage = function(rawPackage){
     });
 
     return $package;
+};
+
+//to-tell
+Package.toPOJO = function($package){
+    var pojo = _.mapValues($package, function(value, key){
+        if(key == '__versions'){
+            return _.mapValues(value, function($version){
+                return $version.toPOJO();
+            });
+        }
+
+        return value;
+    });
+
+    pojo.versions = pojo.__versions;
+    delete pojo.__versions;
+
+    return pojo;
 };
 
 /**
@@ -140,6 +201,11 @@ Version.prototype.get = function(name){
     return this.__builds;
 };
 
+//to-tell
+Version.prototype.toPOJO = function(){
+    return Version.toPOJO(this);
+}
+
 /**
  * Create {@link Version} from raw object (packages.json)
  * @param rawVersion
@@ -159,6 +225,26 @@ Version.parseRawVersion = function(rawVersion) {
     });
 
     return version;
+};
+
+//to-tell
+Version.toPOJO = function($version) {
+    var pojo = _.mapValues($version, function(value, key){
+        if('__builds' == key){
+            return _.map(value, function(v, k){
+                return v.name;
+            });
+        }
+        return value;
+    });
+
+    pojo.builds = pojo.__builds;
+    delete pojo.__builds;
+
+    pojo.version = pojo.name;
+    delete pojo.name;
+
+    return pojo;
 };
 
 /**

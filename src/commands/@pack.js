@@ -1,7 +1,7 @@
 var fs     = require('fs');
 var path   = require('path');
 var _      = require('lodash');
-var logger = require('../logger');
+//var logger = require('../logger');
 
 exports = module.exports = function(ohAll){
     var self = this;
@@ -10,36 +10,35 @@ exports = module.exports = function(ohAll){
     self.description = 'Packing version';
     self.fn = function(rawQuery) {
 
-        var _dir= './src'
-        var rootPackages = JSON.parse(fs.readFileSync('./packages.json'));
-        var packageDescriptor = ohAll.createPackageDescriptor(rawQuery, _dir);
+        var query = ohAll.parseQueryString(rawQuery);
+        var _dir= './src';
 
-        var path_list = ohAll.generatePathFromDescriptor(packageDescriptor, _dir);
+        var $packages = ohAll.createPackageDescriptor(query, _dir);
+        var $package = $packages.get(query.name);
 
+        var path_list = ohAll.generatePathFromDescriptor($package, _dir);
+
+        //noinspection JSUnresolvedFunction
         _.each(path_list, function(pathInfo){
             ohAll.pack(pathInfo.path, function(zip){
 
                 var zipOptions = { type:'nodebuffer', compression:'DEFLATE', comment : pathInfo.comment };
-                var zipFileContent = zip.generate(zipOptions)
+                //noinspection JSUnresolvedFunction
+                var zipFileContent = zip.generate(zipOptions);
                 var zipFileName = path.normalize( './' + pathInfo.file + '.zip');
 
                 fs.writeFileSync(zipFileName, zipFileContent, 'binary');
                 //TODO logger
             }, function(err){
                 console.log(err); //TODO logger
-            })
+            });
         });
 
+        var $rootPackages = ohAll.readPackagesFromFile('./packages.json');
 
+        var $mergedPackages = $rootPackages.merge($packages);
 
-
-
-        //read packages.json
-        // - add package
-        // - add default version
-        // - add versions
-        // - add builds
-        // - add default builds
+        ohAll.writePackagesToFile($mergedPackages, './packages.json');
     }
 
 
