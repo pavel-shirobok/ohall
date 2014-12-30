@@ -5,9 +5,6 @@ var _      = require('lodash');
 
 exports = module.exports = function(ohAll){
 
-
-
-
     var self = this;
 
     self.command = 'pack [query]';

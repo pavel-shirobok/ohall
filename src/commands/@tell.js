@@ -16,19 +16,23 @@ exports = module.exports = function(ohAll){
             $package.name
         ).log();
 
-        _.each($package.get(), function($version){
-            var builds = [];
-            _.each($version.get(), function($build){
-                builds.push($build.name.green);
-            });
+        _.each(
+            _.sortBy($package.get(), 'name'),
+            function($version){
+                var builds = [];
 
-            logger.createTellAboutVersion(
-                $version.name,
-                builds,
-                $package.defaultVersion,
-                $version.defaultBuild
-            ).log();
-        });
+                _.each($version.get(), function($build) {
+                    builds.push($build.name);
+                });
+
+                logger.createTellAboutVersion(
+                    $version.name,
+                    builds,
+                    $package.defaultVersion,
+                    $version.defaultBuild
+                ).log();
+            }
+        );
 
     }
 };

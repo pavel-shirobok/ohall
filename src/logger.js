@@ -1,3 +1,4 @@
+var _ = require('lodash');
 require('colors').setTheme({
     variable : 'blue',
     value    : 'yellow',
@@ -38,8 +39,15 @@ module.exports.createTellHeader = function(packageName) {
 };
 
 module.exports.createTellAboutVersion = function(versionName, builds, defaultVersion, defaultBuild){
+    function highlight(value, flag){ return value == flag ? value.bgGreen.white : value.red; }
 
-    versionName = versionName == defaultVersion? versionName.bgGreen.white : versionName.red;
-
-    return new Message(' * ' + versionName)
+    return new Message(
+        ' * ' + highlight(versionName, defaultVersion) +
+        '\t - [ ' +
+            _.map(
+                builds,
+                function(b){ return highlight(b, defaultBuild); }
+            ).join(', ') +
+        ' ]'
+    );
 };
