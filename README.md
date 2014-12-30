@@ -24,7 +24,13 @@ npm install ohall --global
 > Ohh all! - me
 
 ###Commands
+- ```ohall get name``` - getting property value from global settings
 - ```ohall list``` - getting all packages which ohall 'know'
 - ```ohall install package``` or ```ohall install package1 package2 packageN``` - installing packages into current directory
 - ```ohall set name value``` - save property for global settings(example : CDN_URL)
-- ```ohall get name``` - getting property value from global settings
+- ```ohall pack query``` - packing new package by query
+- ```ohall find query``` - finding packages by string query
+- ```ohall tell package``` - telling about concrete package name, descriptions, available versions, builds etc.
+
+### Flags
+- ```ohall --dev``` - starting ohall without loading package.json from server, starting with empty repository, for development only
