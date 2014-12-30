@@ -45,7 +45,7 @@ module.exports.createTellAboutVersion = function(versionName, builds, defaultVer
         ' * ' + highlight(versionName, defaultVersion) +
         '\t - [ ' +
             _.map(
-                builds,
+                _.sortBy(builds),
                 function(b){ return highlight(b, defaultBuild); }
             ).join(', ') +
         ' ]'
