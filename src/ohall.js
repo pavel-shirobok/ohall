@@ -24,6 +24,10 @@ OhAll.prototype.getSetting = function(name) {
     return this.settings.get(name);
 };
 
+OhAll.prototype.settingsToDefault = function(){
+    return this.settings.resetToDefault();
+};
+
 OhAll.prototype.loadPackages = function(onComplete, onError) {
 
     var request_parameters = {

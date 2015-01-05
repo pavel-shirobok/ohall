@@ -3,10 +3,15 @@ var path = require('path');
 
 var Settings = function(file, default_settings){
     this.file = path.resolve(__dirname + '\\..\\' + file);
+    this.__default_settings = default_settings;
 
     this.__createFileIfNotExist(this.file, default_settings);
 
     this.settings = this.__readSettingsFile(this.file);
+};
+
+Settings.prototype.resetToDefault = function(){
+    this.flushSettings(this.file, this.__default_settings);
 };
 
 Settings.prototype.__createFileIfNotExist = function(file, config){
