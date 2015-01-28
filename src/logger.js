@@ -51,3 +51,13 @@ module.exports.createTellAboutVersion = function(versionName, builds, defaultVer
         ' ]'
     );
 };
+
+module.exports.devHeader = function() {
+    return new Message(
+        'Developer mode : '.green +  'ON'.red
+    );
+};
+
+module.exports.unknownPackageName = function(packageName){
+    return new Message('Unknown package with name: '.red + packageName.red)
+};

@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+var handlers    = require('./commonEventHandlers');
+var logger      = require('./logger');
 var Spinner     = require('./spinner');
 var argv        = require('optimist').argv;
 var _           = require('lodash');
@@ -24,28 +26,35 @@ _(require('./commands/commandsList')).each(function(CommandClass){
         action(command.fn);
 });
 
-var spinner = new Spinner();
-spinner.start();
 
 
+if(argv.log) {
 
-
-if(argv.dev) {
-    console.log('Dev start'); // TODO logger
-    ohAll.loadEmptyPackages(); //refactor for using loadFromObject({})
-    spinner.stop();
-    commander.parse(process.argv);
+    logger.devHeader().log();
+    handlers.onError('Loading packages', new Error('Test message'));
+    logger.unknownPackageName('testPackage').log();
 }else {
-    ohAll.loadPackages(
-        function() {
-            spinner.stop();
-            commander.parse(process.argv);
-        },
-        function(error){
-            spinner.stop();
-            //TODO error console
-            console.log(error);
-        }
-    );
+    var spinner = new Spinner();
+    spinner.start();
+    if(argv.dev) {
+        logger.devHeader().log();
+        ohAll.loadEmptyPackages(); //refactor for using loadFromObject({})
+        spinner.stop();
+        commander.parse(process.argv);
+    }else {
+        ohAll.loadPackages(
+            function() {
+                spinner.stop();
+                commander.parse(process.argv);
+            },
+            function(error){
+                spinner.stop();
+                handlers.onError('Loading packages', error);
+            }
+        );
+    }
 }
+
+
+
 

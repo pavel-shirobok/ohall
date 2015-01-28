@@ -1,4 +1,5 @@
 var logger = require('../logger');
+var handlers = require('../commonEventHandlers');
 var prompt = require('prompt');
 
 exports = module.exports = function(ohAll){
@@ -6,9 +7,7 @@ exports = module.exports = function(ohAll){
 
     self.command = 'default';
     self.description = 'Resetting all settings to default';
-    self.fn = function(name) {
-        //TODO logger
-
+    self.fn = function() {
         var schema = {
             properties: {
                 answer: {
@@ -25,12 +24,12 @@ exports = module.exports = function(ohAll){
         prompt.start();
         prompt.get(schema, function (err, result) {
             if(err){
-                console.log(err);
+                handlers.onError('Getting answer', err);
                 return;
             }
             if(result.answer.toLowerCase() == 'yes') {
                 ohAll.settingsToDefault();
-                console.log('to default');//todo logger
+                console.log('Settings reseted to default'.green);
             }
         });
     }

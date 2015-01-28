@@ -8,8 +8,7 @@ exports = module.exports = function(ohAll){
     self.fn = function(packageName) {
         var $package = ohAll.packages.get(packageName);
         if(!$package){
-            //todo logger error
-            console.log('unknown %s', packageName);
+            logger.unknownPackageName(packageName).log();
             return;
         }
 

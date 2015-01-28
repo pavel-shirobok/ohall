@@ -13,12 +13,9 @@ exports = module.exports = function(ohAll){
 
         if(packages.length){
             self.packages = packages;
-
             self.next();
-
         } else {
-            console.log('coming soon in version 0.2.0');
-            //install from ohall.json
+            console.log('please specify one or more packages'.red);
         }
     };
 

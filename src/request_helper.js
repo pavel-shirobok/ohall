@@ -24,7 +24,6 @@ var RQ = function (parameters) {
 
     self.finish = function () {
         var config = _.extend({
-            //TODO default params
             format: 'json'
         }, self.parameters);
         request(config, function (error, response, body) {

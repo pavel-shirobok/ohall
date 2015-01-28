@@ -16,14 +16,13 @@ Spinner.prototype.start = function(){
 
 Spinner.prototype.print = function(){
     this.clearSpinner();
-    //todo logger
     process.stdout.write(["Processing...".blue, this.spin.current.red].join(" "));
 };
 
 Spinner.prototype.clearSpinner = function(){
     process.stdout.clearLine();
     process.stdout.cursorTo(0);
-}
+};
 
 Spinner.prototype.stop = function(){
     if(this.interval == -1) return;

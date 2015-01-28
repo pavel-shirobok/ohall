@@ -10,3 +10,7 @@ module.exports.onPackageInstallError = function(error){
     console.log('error', error); //TODO
 };
 
+module.exports.onError = function(errorAction, error) {
+    console.log(errorAction.blue, 'failed with', error);
+  //TODO
+};
